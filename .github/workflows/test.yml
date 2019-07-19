@@ -1,0 +1,78 @@
+name: Test
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  ## Disabled because they seem to not be supported on GH actions
+  # test-pre4:
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       node-version: [0.10, 0.12, 1.8, 2.5, 3.3]
+  #   steps:
+  #   - uses: actions/checkout@v1
+  #   - name: Use Node.js ${{ matrix.node-version }}
+  #     uses: actions/setup-node@v1
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #   - name: npm install
+  #     run: npm i
+  #   - name: install legacy packages
+  #     run: npm install --silent --save-dev supertest@2.0.0 mocha@3.5.3
+  #   - name: npm test
+  #     run: npm t
+
+  test-4to6:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [4.9, 5.12, 6.17]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install
+      run: npm i
+    - name: install legacy packages
+      run: npm install --silent --save-dev mocha@3.5.3
+    - name: npm test
+      run: npm run test-ci
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [7.10, 8.16, 9.11, 10.15, 11.15, 12.3, 13]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install
+      run: npm i
+    - name: npm test
+      run: npm run test-ci
+
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js 13
+      uses: actions/setup-node@v1
+      with:
+        node-version: 13
+    - name: npm install
+      run: npm i
+    - name: npm lint
+      run: npm run lint
+    - name: npm test and coverage
+      run: npm run test-cover
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
